@@ -9,13 +9,20 @@ public class Ingredient {
     private CategoryEnum category;
     private Dish dish;
 
-    public Ingredient(int id, String name, CategoryEnum category, Double price, Dish dish) {
+    public Ingredient(int id, String name, Double price, CategoryEnum category, Dish dish) {
         this.id = id;
         this.name = name;
-        this.category = category;
         this.price = price;
+        this.category = category;
         this.dish = dish;
     }
+
+    public Ingredient(String name, double price, CategoryEnum category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
 
     public int getId() {
         return id;
@@ -57,6 +64,13 @@ public class Ingredient {
         this.dish = dish;
     }
 
+    public String getDishName() {
+        if (dish == null) {
+            return "";
+        }
+        return dish.getName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -76,11 +90,7 @@ public class Ingredient {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", category=" + category +
-                ", dish=" + dish +
+                ", dish=" + this.getDishName()+
                 '}';
-    }
-
-    public String getDishName() {
-        return dish.getName();
     }
 }
