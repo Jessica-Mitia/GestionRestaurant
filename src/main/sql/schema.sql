@@ -19,3 +19,7 @@ CREATE TABLE ingredient (
         foreign key (dish_id)
         references dish(id)
 );
+
+
+-- SELECT setval('dish_id_seq', (SELECT MAX(id) FROM dish));
+-- SELECT setval('ingredient_id_seq', (SELECT MAX(id)) FROM ingredient));
