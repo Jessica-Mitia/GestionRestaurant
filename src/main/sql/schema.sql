@@ -16,10 +16,12 @@ CREATE TABLE ingredient (
     price numeric,
     category category_enum,
     constraint fk_dish
-        foreign key (dish_id)
+        foreign key (id_dish)
         references dish(id)
 );
 
+ALTER TABLE
 
--- SELECT setval('dish_id_seq', (SELECT MAX(id) FROM dish));
+
+-- SELECT setval('id_dish_seq', (SELECT MAX(id) FROM dish));
 -- SELECT setval('ingredient_id_seq', (SELECT MAX(id)) FROM ingredient));

@@ -14,15 +14,8 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         DataRetriever data = new DataRetriever();
 
-        System.out.println("Find dish by ID");
-        System.out.println(data.findDishById(1));
-        System.out.println(data.findDishById(199));
-
-        System.out.println("Find ingredients");
-        System.out.println(data.findIngredients(2,2));
-        System.out.println(data.findIngredients(3,5));
-
-        System.out.println("Find dish by ingredient name");
-        System.out.println(data.findIngredientByName("eur"));
+        System.out.println("Find dish by id");
+        System.out.println(data.findDishById(2));
+        System.out.println(data.findDishById(2).getGrossMargin());
     }
 }

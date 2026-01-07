@@ -24,10 +24,10 @@ public class DataRetriever {
 
         StringBuilder sql = new StringBuilder(
                 """
-                    SELECT d.id AS d_id, d.name AS d_name, d.dish_type AS d_type,
+                    SELECT d.id AS d_id, d.name AS d_name, d.dish_type AS d_type, d.price AS d_price,
                     i.id AS i_id, i.name AS i_name, i.price AS i_price, i.category AS i_category
                     FROM dish d
-                    LEFT JOIN ingredient i ON d.id = i.dish_id
+                    LEFT JOIN ingredient i ON d.id = i.id_dish
                     WHERE d.id = ?
                 """
         );
@@ -46,7 +46,8 @@ public class DataRetriever {
                                 rs.getInt("d_id"),
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
-                                ingredients
+                                ingredients,
+                                rs.getDouble("d_price")
                         );
                     }
 
@@ -61,7 +62,7 @@ public class DataRetriever {
                         ingredients.add(ingredient);
                     }
                 }
-            }  catch (SQLException e) {
+            } catch (SQLException e) {
                 throw new RuntimeException("SQLException: " + e.getMessage());
             }
         }
@@ -77,18 +78,19 @@ public class DataRetriever {
         DBConnection db = new DBConnection();
 
         StringBuilder sql = new StringBuilder(
-                            """
-                                SELECT i.id            AS i_id,
-                                        i.name          AS i_name,
-                                        i.price         AS i_price,
-                                        i.category      AS i_category,
-                                        d.id            AS d_id,
-                                        d.name          AS d_name,
-                                        d.dish_type     AS d_type
-                                FROM ingredient i
-                                LEFT JOIN dish d ON i.dish_id = d.id
-                                LIMIT ? OFFSET ?
-                             """
+                """
+                    SELECT i.id            AS i_id,
+                           i.name          AS i_name,
+                           i.price         AS i_price,
+                           i.category      AS i_category,
+                           d.id            AS d_id,
+                           d.name          AS d_name,
+                           d.dish_type     AS d_type,
+                           d.price         AS d_price,
+                    FROM ingredient i
+                    LEFT JOIN dish d ON i.id_dish = d.id
+                    LIMIT ? OFFSET ?
+                """
         );
 
         try (
@@ -107,7 +109,8 @@ public class DataRetriever {
                                 rs.getInt("d_id"),
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
-                                new ArrayList<>()
+                                new ArrayList<>(),
+                                rs.getDouble("d_price")
                         );
                     }
 
@@ -136,11 +139,12 @@ public class DataRetriever {
 
         List<Ingredient> savedIngredients = new ArrayList<>();
 
-        try (Connection con = db.getDBConnection()){
+        try (Connection con = db.getDBConnection()) {
             con.setAutoCommit(false);
 
             try (PreparedStatement checkPs = con.prepareStatement(checkSql);
-            PreparedStatement insertPs = con.prepareStatement(insertSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                 PreparedStatement insertPs = con.prepareStatement(insertSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
                 for (Ingredient ingredient : newIngredients) {
                     checkPs.setString(1, ingredient.getName());
                     try (ResultSet rs = checkPs.executeQuery()) {
@@ -153,7 +157,7 @@ public class DataRetriever {
 
                     insertPs.setString(1, ingredient.getName());
                     insertPs.setDouble(2, ingredient.getPrice());
-                    insertPs.setString(3,ingredient.getCategory().name());
+                    insertPs.setString(3, ingredient.getCategory().name());
                     insertPs.executeUpdate();
 
                     try (ResultSet keys = insertPs.getGeneratedKeys()) {
@@ -228,8 +232,8 @@ public class DataRetriever {
             StringBuilder detachIngredients = new StringBuilder(
                     """
                         UPDATE ingredient
-                        SET dish_id = NULL
-                        WHERE dish_id = ?
+                        SET id_dish = NULL
+                        WHERE id_dish = ?
                     """
             );
 
@@ -241,7 +245,7 @@ public class DataRetriever {
             StringBuilder attachIngredient = new StringBuilder(
                     """
                         UPDATE ingredient
-                        SET dish_id = ?
+                        SET id_dish = ?
                         WHERE id = ?
                     """
             );
@@ -264,25 +268,24 @@ public class DataRetriever {
     }
 
 
-
     public List<Dish> findDishsByIngredientName(String ingredientName) throws SQLException {
         DBConnection db = new DBConnection();
         Map<Integer, Dish> dishMap = new HashMap<>();
 
         StringBuilder sql = new StringBuilder(
                 """
-                    SELECT d.id AS d_id, d.name AS d_name, d.dish_type AS d_type,
+                    SELECT d.id AS d_id, d.name AS d_name, d.dish_type AS d_type, d.price as d_price,
                     i.id AS i_id, i.name AS i_name, i.price AS i_price, i.category AS i_category
                     FROM dish d
-                    LEFT JOIN ingredient i ON d.id = i.dish_id
+                    LEFT JOIN ingredient i ON d.id = i.id_dish
                     WHERE d.id IN (
-                        SELECT dish_id
+                        SELECT id_dish
                         FROM ingredient
                         WHERE name ILIKE ?
                     )
                     ORDER BY d.id
                 """
-            );
+        );
 
         try (
                 Connection con = db.getDBConnection();
@@ -301,7 +304,8 @@ public class DataRetriever {
                                 dishId,
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
-                                new ArrayList<>()
+                                new ArrayList<>(),
+                                rs.getDouble("d_price")
                         );
                         dishMap.put(dishId, dish);
                     }
@@ -324,15 +328,14 @@ public class DataRetriever {
     }
 
 
-
-    public List<Ingredient> findIngredientsByCriteria (String ingredientName, CategoryEnum category, String dishName, int page, int size) throws SQLException {
+    public List<Ingredient> findIngredientsByCriteria(String ingredientName, CategoryEnum category, String dishName, int page, int size) throws SQLException {
         DBConnection db = new DBConnection();
         StringBuilder sql = new StringBuilder(
                 """
                 SELECT i.id AS i_id, i.name AS i_name, i.price AS i_price, i.category AS i_category,
-                d.id AS d_id, d.name AS d_name, d.dish_type AS d_type
+                d.id AS d_id, d.name AS d_name, d.dish_type AS d_type, d.price AS d_price,
                 FROM ingredient i
-                JOIN dish d ON i.dish_id = d.id
+                JOIN dish d ON i.id_dish = d.id
                 WHERE 1=1
                 """
         );
@@ -376,7 +379,8 @@ public class DataRetriever {
                                 rs.getInt("d_id"),
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
-                                new ArrayList<>()
+                                new ArrayList<>(),
+                                rs.getDouble("d_price")
                         );
                     }
 
@@ -400,17 +404,17 @@ public class DataRetriever {
         DBConnection db = new DBConnection();
         StringBuilder sql = new StringBuilder(
                 """
-                    SELECT i.id as i_id,i.name as i_name,i.price as i_price,i.category as i_category, i.dish_id as i_dish_id,
-                    d.id as d_id, d.name as d_name, d.dish_type as d_type
+                    SELECT i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category, i.id_dish as i_id_dish,
+                    d.id as d_id, d.name as d_name, d.dish_type as d_type, d.price as d_price
                     from ingredient i
-                    left join dish d on i.dish_id = d.id
+                    left join dish d on i.id_dish = d.id
                     where i.name ILIKE ?
                 """
         );
         Ingredient ingredient = null;
 
         try (Connection con = db.getDBConnection();
-        PreparedStatement ps = con.prepareStatement(sql.toString())) {
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
             ps.setString(1, name);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -420,7 +424,8 @@ public class DataRetriever {
                                 rs.getInt("d_id"),
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
-                                new ArrayList<>()
+                                new ArrayList<>(),
+                                rs.getDouble("d_price")
                         );
                     }
 
@@ -437,4 +442,3 @@ public class DataRetriever {
         }
     }
 }
-
