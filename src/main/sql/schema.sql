@@ -20,7 +20,8 @@ CREATE TABLE ingredient (
         references dish(id)
 );
 
-ALTER TABLE
+ALTER TABLE dish
+    ADD COLUMN IF NOT EXISTS price DOUBLE PRECISION;
 
 
 -- SELECT setval('id_dish_seq', (SELECT MAX(id) FROM dish));

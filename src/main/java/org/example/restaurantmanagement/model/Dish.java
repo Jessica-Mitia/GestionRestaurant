@@ -25,8 +25,11 @@ public class Dish {
         this.ingredients = ingredients;
     }
 
-    public Dish() {
-
+    public Dish (String name, DishTypeEnum dishType, List<Ingredient> ingredients, Double price) {
+        this.name = name;
+        this.dishType = dishType;
+        this.ingredients = ingredients;
+        this.price = price;
     }
 
     public int getId() {
@@ -73,12 +76,16 @@ public class Dish {
         return this.ingredients.stream().mapToDouble(Ingredient::getPrice).sum();
     }
 
-    public Double getGrossMargin () {
-        if (this.price == null){
-            throw new RuntimeException("price is null");
+    public Double getGrossMargin() {
+        if (price == null) {
+            throw new RuntimeException(
+                    "Le prix de vente n'est pas défini, impossible de calculer la marge"
+            );
         }
-        return this.price - this.getDishCost();
+
+        return price - this.getDishCost();
     }
+
 
     @Override
     public boolean equals(Object o) {

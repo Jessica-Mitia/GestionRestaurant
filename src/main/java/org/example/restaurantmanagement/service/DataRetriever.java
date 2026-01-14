@@ -47,7 +47,7 @@ public class DataRetriever {
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
                                 ingredients,
-                                rs.getDouble("d_price")
+                                rs.getObject("d_price", Double.class)
                         );
                     }
 
@@ -79,14 +79,8 @@ public class DataRetriever {
 
         StringBuilder sql = new StringBuilder(
                 """
-                    SELECT i.id            AS i_id,
-                           i.name          AS i_name,
-                           i.price         AS i_price,
-                           i.category      AS i_category,
-                           d.id            AS d_id,
-                           d.name          AS d_name,
-                           d.dish_type     AS d_type,
-                           d.price         AS d_price,
+                    SELECT i.id AS i_id, i.name AS i_name, i.price AS i_price, i.category AS i_category,
+                    d.id AS d_id, d.name AS d_name, d.dish_type AS d_type, d.price AS d_price,
                     FROM ingredient i
                     LEFT JOIN dish d ON i.id_dish = d.id
                     LIMIT ? OFFSET ?
@@ -109,8 +103,8 @@ public class DataRetriever {
                                 rs.getInt("d_id"),
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
-                                new ArrayList<>(),
-                                rs.getDouble("d_price")
+                                ingredients,
+                                rs.getObject("d_price", Double.class)
                         );
                     }
 
@@ -191,8 +185,8 @@ public class DataRetriever {
             if (dishId == null || dishId == 0) {
                 StringBuilder insertDish = new StringBuilder(
                         """
-                            INSERT INTO dish(name, dish_type)
-                            VALUES (?, ?::dish_type_enum)
+                            INSERT INTO dish(name, dish_type, price)
+                            VALUES (?, ?::dish_type_enum, ?)
                             RETURNING id
                         """
                 );
@@ -200,6 +194,7 @@ public class DataRetriever {
                 try (PreparedStatement ps = con.prepareStatement(insertDish.toString())) {
                     ps.setString(1, dishToSave.getName());
                     ps.setString(2, dishToSave.getDishType().name());
+                    ps.setObject(3, dishToSave.getPrice());
 
                     ResultSet rs = ps.executeQuery();
                     if (rs.next()) {
@@ -216,7 +211,7 @@ public class DataRetriever {
                 StringBuilder updateDish = new StringBuilder(
                         """
                             UPDATE dish
-                            SET name = ?, dish_type = ?::dish_type_enum
+                            SET name = ?, dish_type = ?::dish_type_enum, price = ?
                             WHERE id = ?
                         """
                 );
@@ -224,7 +219,8 @@ public class DataRetriever {
                 try (PreparedStatement ps = con.prepareStatement(updateDish.toString())) {
                     ps.setString(1, dishToSave.getName());
                     ps.setString(2, dishToSave.getDishType().name());
-                    ps.setInt(3, dishId);
+                    ps.setObject(3, dishToSave.getPrice());
+                    ps.setInt(4, dishId);
                     ps.executeUpdate();
                 }
             }
@@ -268,6 +264,7 @@ public class DataRetriever {
     }
 
 
+
     public List<Dish> findDishsByIngredientName(String ingredientName) throws SQLException {
         DBConnection db = new DBConnection();
         Map<Integer, Dish> dishMap = new HashMap<>();
@@ -305,7 +302,7 @@ public class DataRetriever {
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
                                 new ArrayList<>(),
-                                rs.getDouble("d_price")
+                                rs.getObject("d_price", Double.class)
                         );
                         dishMap.put(dishId, dish);
                     }
@@ -380,7 +377,7 @@ public class DataRetriever {
                                 rs.getString("d_name"),
                                 DishTypeEnum.valueOf(rs.getString("d_type")),
                                 new ArrayList<>(),
-                                rs.getDouble("d_price")
+                                rs.getObject("d_price", Double.class)
                         );
                     }
 
@@ -432,7 +429,7 @@ public class DataRetriever {
                     ingredient = new Ingredient(
                             rs.getInt("i_id"),
                             rs.getString("i_name"),
-                            rs.getDouble("i_price"),
+                            rs.getObject("d_price", Double.class),
                             CategoryEnum.valueOf(rs.getString("i_category")),
                             dish
                     );
