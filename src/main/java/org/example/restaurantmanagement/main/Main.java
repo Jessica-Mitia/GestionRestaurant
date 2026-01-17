@@ -12,21 +12,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        DataRetriever data = new DataRetriever();
+        DataRetriever dr = new DataRetriever();
 
-        List<Ingredient> ingredients = new ArrayList<>();
-        Ingredient i1 = data.findIngredientByName("Chocolat");
-        Ingredient i2 = data.findIngredientByName("Beure");
-        ingredients.add(i2);
-
-        Dish dish = new Dish(10,"Pain au raisin", DishTypeEnum.DESSERT, ingredients, 4000.0);
-
-        System.out.println("Find dish by id");
-        System.out.println(data.findDishById(1));
-        System.out.println(data.findDishById(1).getGrossMargin());
-        System.out.println(data.findDishById(5).getGrossMargin());
-
-        //System.out.println("Save dish");
-        //System.out.println(data.saveDish(dish));
+        System.out.println(dr.findDishById(1));
     }
 }

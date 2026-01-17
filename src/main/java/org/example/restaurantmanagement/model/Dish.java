@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class Dish {
-    private int id;
+    private Integer id;
     private String name;
     private DishTypeEnum dishType;
     private List<Ingredient> ingredients;
     private Double price;
 
-    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredient> ingredients, Double price) {
+    public Dish() {}
+
+    public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredient> ingredients, Double price) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
@@ -32,11 +34,11 @@ public class Dish {
         this.price = price;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -14,6 +14,20 @@ public class DBConnection {
     private String PASSWORD = dotenv.get("PASSWORD");
 
     public Connection getDBConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        try {
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void closeDBConnection(Connection connection) throws SQLException {
+        if (connection != null) {
+            try {
+                connection.close();
+            }catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

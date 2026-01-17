@@ -3,18 +3,22 @@ package org.example.restaurantmanagement.model;
 import java.util.Objects;
 
 public class Ingredient {
-    private int id;
+    private Integer id;
     private String name;
     private Double price;
     private CategoryEnum category;
     private Dish dish;
+    private Double quantity;
 
-    public Ingredient(int id, String name, Double price, CategoryEnum category, Dish dish) {
+    public Ingredient() {}
+
+    public Ingredient(Integer id, String name, Double price, CategoryEnum category, Dish dish, Double quantity) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
         this.dish = dish;
+        this.quantity = quantity;
     }
 
     public Ingredient(String name, double price, CategoryEnum category) {
@@ -24,11 +28,11 @@ public class Ingredient {
     }
 
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -64,6 +68,10 @@ public class Ingredient {
         this.dish = dish;
     }
 
+    public Double getQuantity() { return quantity; }
+
+    public void setQuantity(Double quantity) { this.quantity = quantity; }
+
     public String getDishName() {
         if (dish == null) {
             return "";
@@ -90,6 +98,7 @@ public class Ingredient {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", category=" + category +
+                ", quantity=" + quantity +
                 ", dish=" + this.getDishName()+
                 '}';
     }
