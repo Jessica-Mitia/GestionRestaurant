@@ -99,7 +99,7 @@ public class Ingredient {
                 ", price=" + price +
                 ", category=" + category +
                 ", quantity=" + quantity +
-                ", dish=" + this.getDishName()+
+                ", dishName=" + this.getDishName()+
                 '}';
     }
 }

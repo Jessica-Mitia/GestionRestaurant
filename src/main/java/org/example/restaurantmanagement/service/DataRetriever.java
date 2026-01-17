@@ -43,6 +43,44 @@ public class DataRetriever {
         }
     }
 
+    public List<Ingredient> findIngredients (int page, int size) throws SQLException {
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.getDBConnection();
+
+        List<Ingredient> ingredients = new ArrayList<>();
+        int offset = (page - 1) * size;
+
+        String findIngredientsSql = """
+                    SELECT ingredient.id as ingredient_id, ingredient.name as ingredient_name, ingredient.price as ingredient_price, ingredient.category as category,
+                    dish.id as dish_id, dish.name as dish_name, dish.dish_type as dish_type, dish.selling_price as dish_price,
+                    dish_ingredient.id_dish as dish_i_id_dish, dish_ingredient.id_ingredient dish_i_id_ingredient, dish_ingredient.quantity_required as quantity
+                    from dish_ingredient left join ingredient on dish_ingredient.id_ingredient = ingredient.id
+                    left join dish on dish_ingredient.id_dish = dish.id
+                    limit ? offset ?
+                """;
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(findIngredientsSql);
+            preparedStatement.setInt(1, size);
+            preparedStatement.setInt(2, offset);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(resultSet.getInt("ingredient_id"));
+                ingredient.setName(resultSet.getString("ingredient_name"));
+                ingredient.setPrice(resultSet.getDouble("ingredient_price"));
+                ingredient.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
+                ingredient.setQuantity(resultSet.getDouble("quantity"));
+                ingredients.add(ingredient);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ingredients;
+    };
+
     public Dish saveDish(Dish toSave) {
         String upsertDishSql = """
                     INSERT INTO dish (id, selling_price, name, dish_type)

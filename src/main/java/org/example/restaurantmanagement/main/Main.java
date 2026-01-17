@@ -14,6 +14,6 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         DataRetriever dr = new DataRetriever();
 
-        System.out.println(dr.findDishById(1));
+        System.out.println(dr.findIngredients(2,2));
     }
 }
