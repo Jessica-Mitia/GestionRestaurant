@@ -75,7 +75,11 @@ public class Dish {
     }
 
     public Double getDishCost() {
-        return this.ingredients.stream().mapToDouble(Ingredient::getPrice).sum();
+        Double cost = 0.0;
+        for (Ingredient ingredient : ingredients) {
+            cost += ingredient.getPrice() * ingredient.getQuantity();
+        }
+        return cost;
     }
 
     public Double getGrossMargin() {

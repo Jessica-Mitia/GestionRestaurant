@@ -124,6 +124,7 @@ public class DataRetriever {
         }
     }
 
+
     public List<Ingredient> createIngredients(List<Ingredient> newIngredients) throws SQLException {
         if (newIngredients == null || newIngredients.isEmpty()) {
             return List.of();

@@ -14,6 +14,10 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         DataRetriever dr = new DataRetriever();
 
-        System.out.println(dr.findIngredients(2,2));
+        System.out.println(dr.findDishById(1).getGrossMargin());
+        System.out.println(dr.findDishById(2).getGrossMargin());
+        //System.out.println(dr.findDishById(3).getGrossMargin());
+        System.out.println(dr.findDishById(4).getGrossMargin());
+        //System.out.println(dr.findDishById(5).getGrossMargin());
     }
 }
