@@ -8,29 +8,29 @@ public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
-    private List<Ingredient> ingredients;
+    private List<DishIngredient> dishIngredients;
     private Double price;
 
     public Dish() {}
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredient> ingredients, Double price) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, List<DishIngredient> dishIngredients, Double price) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
-        this.ingredients = ingredients;
+        this.dishIngredients = dishIngredients;
         this.price = price;
     }
 
-    public Dish (String name, DishTypeEnum dishType, List<Ingredient> ingredients) {
+    public Dish (String name, DishTypeEnum dishType, List<DishIngredient> dishIngredients) {
         this.name = name;
         this.dishType = dishType;
-        this.ingredients = ingredients;
+        this.dishIngredients = dishIngredients;
     }
 
-    public Dish (String name, DishTypeEnum dishType, List<Ingredient> ingredients, Double price) {
+    public Dish (String name, DishTypeEnum dishType, List<DishIngredient> dishIngredients, Double price) {
         this.name = name;
         this.dishType = dishType;
-        this.ingredients = ingredients;
+        this.dishIngredients = dishIngredients;
         this.price = price;
     }
 
@@ -58,12 +58,12 @@ public class Dish {
         this.dishType = dishType;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
+    public List<DishIngredient> getDishIngredients() {
+        return dishIngredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
+    public void setIngredients(List<DishIngredient> dishIngredients) {
+        this.dishIngredients = dishIngredients;
     }
 
     public Double getPrice() {
@@ -74,12 +74,12 @@ public class Dish {
         this.price = price;
     }
 
-    public Double getDishCost() {
-        Double cost = 0.0;
-        for (Ingredient ingredient : ingredients) {
-            cost += ingredient.getPrice() * ingredient.getQuantity();
+    public Double getDishCost()  {
+        Double dishCost = 0.0;
+        for (DishIngredient dishIngredient : dishIngredients) {
+            dishCost += dishIngredient.getIngredient().getPrice() * dishIngredient.getQuantity();
         }
-        return cost;
+        return dishCost;
     }
 
     public Double getGrossMargin() {
@@ -92,17 +92,16 @@ public class Dish {
         return price - this.getDishCost();
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Dish dish = (Dish) o;
-        return id == dish.id && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(ingredients, dish.ingredients);
+        return Objects.equals(id, dish.id) && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(dishIngredients, dish.dishIngredients) && Objects.equals(price, dish.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, dishType, ingredients);
+        return Objects.hash(id, name, dishType, dishIngredients, price);
     }
 
     @Override
@@ -111,8 +110,8 @@ public class Dish {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", dishType=" + dishType +
+                ", dishIngredients=" + dishIngredients +
                 ", price=" + price +
-                ", ingredients=" + ingredients +
                 '}';
     }
 }
