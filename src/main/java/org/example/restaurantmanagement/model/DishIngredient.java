@@ -3,7 +3,7 @@ package org.example.restaurantmanagement.model;
 import java.util.Objects;
 
 public class DishIngredient {
-    private int id;
+    private Integer id;
     private Dish dish;
     private Ingredient ingredient;
     private Double quantity;
@@ -11,7 +11,7 @@ public class DishIngredient {
 
     public DishIngredient() {}
 
-    public DishIngredient(int id, Dish dish, Ingredient ingredient, Double quantity, UnitTypeEnum unitType) {
+    public DishIngredient(Integer id, Dish dish, Ingredient ingredient, Double quantity, UnitTypeEnum unitType) {
         this.id = id;
         this.dish = dish;
         this.ingredient = ingredient;
@@ -19,11 +19,11 @@ public class DishIngredient {
         this.unitType = unitType;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -59,6 +59,20 @@ public class DishIngredient {
         this.unitType = unitType;
     }
 
+    public String getDishName() {
+        if (dish == null) {
+            return "";
+        }
+        return dish.getName();
+    }
+
+    public String getIngredientName() {
+        if (ingredient == null) {
+            return "";
+        }
+        return ingredient.getName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -75,8 +89,8 @@ public class DishIngredient {
     public String toString() {
         return "DishIngredient{" +
                 "id=" + id +
-                ", dish=" + dish +
-                ", ingredient=" + ingredient +
+                ", dishName=" + getDishName() +
+                ", ingredientName=" + getIngredientName() +
                 ", quantity=" + quantity +
                 ", unitType=" + unitType +
                 '}';

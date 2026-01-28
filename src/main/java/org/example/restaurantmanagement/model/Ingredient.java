@@ -1,5 +1,8 @@
 package org.example.restaurantmanagement.model;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Ingredient {
@@ -7,18 +10,16 @@ public class Ingredient {
     private String name;
     private Double price;
     private CategoryEnum category;
-    private Dish dish;
-    private Double quantity;
+    private List<StockMovement> stockMovementList;
 
     public Ingredient() {}
 
-    public Ingredient(Integer id, String name, Double price, CategoryEnum category, Dish dish, Double quantity) {
+    public Ingredient(Integer id, String name, Double price, CategoryEnum category, List<StockMovement> stockMovementList) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
-        this.dish = dish;
-        this.quantity = quantity;
+        this.stockMovementList = stockMovementList;
     }
 
     public Ingredient(String name, double price, CategoryEnum category) {
@@ -60,35 +61,45 @@ public class Ingredient {
         this.category = category;
     }
 
-    public Dish getDish() {
-        return dish;
-    }
-
-    public void setDish(Dish dish) {
-        this.dish = dish;
-    }
-
-    public Double getQuantity() { return quantity; }
-
-    public void setQuantity(Double quantity) { this.quantity = quantity; }
-
-    public String getDishName() {
-        if (dish == null) {
-            return "";
+    public List<StockMovement> getStockMovementList() {
+        if (stockMovementList == null) {
+            stockMovementList = new ArrayList<>();
         }
-        return dish.getName();
+        return stockMovementList;
     }
+
+    public void setStockMovementList(List<StockMovement> stockMovementList) {
+        this.stockMovementList = stockMovementList;
+    }
+
+    public double getStockValueAt(Instant t) {
+        double stock = 0.0;
+        for (StockMovement movement : stockMovementList) {
+            if (!movement.getCreationDateTime().isAfter(t)) {
+                if (movement.getType() == MovementTypeEnum.IN) {
+                    stock += movement.getValue().getQuantity();
+                }
+                if (movement.getType() == MovementTypeEnum.OUT) {
+                    stock -= movement.getValue().getQuantity();
+                }
+            }
+        }
+        return stock;
+    }
+
+
+
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Ingredient that = (Ingredient) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(price, that.price) && category == that.category && Objects.equals(dish, that.dish);
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(price, that.price) && category == that.category && Objects.equals(stockMovementList, that.stockMovementList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, category, dish);
+        return Objects.hash(id, name, price, category, stockMovementList);
     }
 
     @Override
@@ -98,8 +109,7 @@ public class Ingredient {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", category=" + category +
-                ", quantity=" + quantity +
-                ", dishName=" + this.getDishName()+
+                ", stockMovementList=" + stockMovementList +
                 '}';
     }
 }

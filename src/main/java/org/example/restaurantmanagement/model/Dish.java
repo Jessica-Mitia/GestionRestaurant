@@ -1,6 +1,5 @@
 package org.example.restaurantmanagement.model;
 
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +61,7 @@ public class Dish {
         return dishIngredients;
     }
 
-    public void setIngredients(List<DishIngredient> dishIngredients) {
+    public void setDishIngredients(List<DishIngredient> dishIngredients) {
         this.dishIngredients = dishIngredients;
     }
 
