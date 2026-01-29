@@ -279,35 +279,6 @@ public class DataRetriever {
         return toSave;
     }
 
-    public Order saveOrder(Order orderToSave) throws SQLException {
-        DBConnection db = new DBConnection();
-
-        try (Connection conn = db.getDBConnection()) {
-            conn.setAutoCommit(false);
-
-            String sql = """
-                    INSERT INTO "order" (id, reference, creation_datetime)
-                    VALUES (?, ?, ?)
-                """;
-
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, orderToSave.getId());
-                ps.setString(2, orderToSave.getReference());
-                ps.setTimestamp(3, Timestamp.from(orderToSave.getCreationDateTime()));
-                ps.executeUpdate();
-            }
-
-            for (DishOrder d : orderToSave.getDishOrders()) {
-                saveDishOrder(conn, d, orderToSave.getId());
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return orderToSave;
-    }
-
     private void saveDishOrder(Connection conn, DishOrder toSave, Integer orderId) throws SQLException {
         String sql = """
                 INSERT INTO dish_order (id, id_order, id_dish, quantity)
@@ -492,7 +463,7 @@ public class DataRetriever {
         }
     }
 
-    public Order newSaveOrder(Order orderToSave) throws SQLException {
+    public Order saveOrder(Order orderToSave) throws SQLException {
         DBConnection db = new DBConnection();
 
         try (Connection conn = db.getDBConnection()) {
