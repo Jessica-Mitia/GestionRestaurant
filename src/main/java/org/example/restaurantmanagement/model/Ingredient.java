@@ -75,6 +75,7 @@ public class Ingredient {
     public double getStockValueAt(Instant t) {
         double stock = 0.0;
         for (StockMovement movement : stockMovementList) {
+            double stockKg = 0.0;
             if (!movement.getCreationDateTime().isAfter(t)) {
                 if (movement.getType() == MovementTypeEnum.IN) {
                     stock += movement.getValue().getQuantity();
