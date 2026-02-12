@@ -13,13 +13,42 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        DataRetriever data = new DataRetriever();
+        DataRetriever dr = new DataRetriever();
 
-        Dish dish = data.findDishById(1);
-        System.out.println(dish);
+        try {
+            Table table = new Table();
+            table.setId(2);
+            table.setNumber(2);
 
-        Order order = data.findOrderByReference("ORD00001");
-        System.out.println(order);
+
+            TableOrder tableOrder = new TableOrder();
+            tableOrder.setTable(table);
+            tableOrder.setArrivalDateTime(Instant.now());
+            tableOrder.setDepartureDateTime(Instant.now().plus(90, ChronoUnit.MINUTES));
+
+            Order order = new Order();
+            order.setId(57);
+            order.setReference("ORD00018");
+            order.setCreationDateTime(Instant.now());
+            order.setTable(tableOrder);
+
+            Dish dish = dr.findDishById(1);
+
+            DishOrder dishOrder = new DishOrder();
+            dishOrder.setId(38);
+            dishOrder.setDish(dish);
+            dishOrder.setQuantity(2);
+
+            order.setDishOrders(List.of(dishOrder));
+
+            System.out.println(dr.saveOrder(order));;
+
+            System.out.println("Commande enregistrée avec succès !");
+
+        } catch (Exception e) {
+            System.out.println("Erreur: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }
