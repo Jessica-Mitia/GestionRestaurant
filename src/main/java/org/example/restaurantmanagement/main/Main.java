@@ -27,15 +27,15 @@ public class Main {
             tableOrder.setDepartureDateTime(Instant.now().plus(90, ChronoUnit.MINUTES));
 
             Order order = new Order();
-            order.setId(57);
-            order.setReference("ORD00018");
+            order.setId(54);
+            order.setReference("ORD00015");
             order.setCreationDateTime(Instant.now());
             order.setTable(tableOrder);
 
             Dish dish = dr.findDishById(1);
 
             DishOrder dishOrder = new DishOrder();
-            dishOrder.setId(38);
+            dishOrder.setId(36);
             dishOrder.setDish(dish);
             dishOrder.setQuantity(2);
 
