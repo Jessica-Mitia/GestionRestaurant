@@ -9,16 +9,14 @@ public class Order {
     private String reference;
     private Instant creationDateTime;
     private List<DishOrder> dishOrders;
-    private TableOrder table;
 
     public Order() {}
 
-    public Order(List<DishOrder> dishOrders, Instant creationDateTime, String reference, Integer id, TableOrder table) {
+    public Order(List<DishOrder> dishOrders, Instant creationDateTime, String reference, Integer id) {
         this.dishOrders = dishOrders;
         this.creationDateTime = creationDateTime;
         this.reference = reference;
         this.id = id;
-        this.table = table;
     }
 
     public Integer getId() {
@@ -51,14 +49,6 @@ public class Order {
 
     public void setDishOrders(List<DishOrder> dishOrders) {
         this.dishOrders = dishOrders;
-    }
-
-    public TableOrder getTableOrder() {
-        return table;
-    }
-
-    public void setTable(TableOrder table) {
-        this.table = table;
     }
 
     @Override
