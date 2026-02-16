@@ -394,4 +394,92 @@ public class DataRetriever {
         return order;
     }
 
+
+    public StockValue getStockValueAt (Instant t, Integer ingredientIdentifier) throws SQLException {
+        DBConnection db = new DBConnection();
+        String sql = """
+                    SELECT
+                       unit,
+                       SUM(
+                           CASE
+                    	       WHEN type = 'OUT' THEN quantity * -1
+                                   ELSE quantity
+                                   END
+                           ) AS actual_quantity
+                    FROM stock_movement
+                    WHERE id_ingredient = ?
+                    AND creation_datetime <= ?
+                    GROUP BY id_ingredient, unit
+                """;
+
+        StockValue stockValue = new StockValue();
+
+        try (Connection conn = db.getDBConnection();){
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setInt(1, ingredientIdentifier);
+            ps.setTimestamp(2, Timestamp.from(t));
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                stockValue.setUnit(UnitTypeEnum.valueOf(rs.getString("unit")));
+
+                Double quantity =
+                        rs.getObject("actual_quantity") == null
+                                ? 0.0
+                                : rs.getDouble("actual_quantity");
+
+                stockValue.setQuantity(quantity);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return stockValue;
+    }
+
+    public Double getDishCost (Integer dishId) throws SQLException {
+        DBConnection db = new DBConnection();
+        String sql = """
+                    select dish.id, dish.name, ROUND(sum(ingredient.price * di.quantity_required), 2) AS dishCost
+                    FROM dish_ingredient AS di
+                    LEFT JOIN dish ON di.id_dish = dish.id
+                    LEFT JOIN ingredient ON di.id_ingredient = ingredient.id
+                    WHERE dish.id = ?
+                    GROUP BY dish.id
+                """;
+
+        try (Connection conn = db.getDBConnection();) {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, dishId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("dishCost");
+            }
+        }
+
+        return null;
+    }
+
+
+    public Double getGrossMargin (Integer dishId) throws SQLException {
+        DBConnection db = new DBConnection();
+        String sql = "SELECT dish.selling_price FROM dish WHERE dish.id = ?";
+
+        Double grossMargin = null;
+
+        try (Connection conn = db.getDBConnection();) {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, dishId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Double sellingPrice = rs.getDouble("selling_price");
+                grossMargin = sellingPrice - getDishCost(dishId);
+            }
+        }
+
+        return grossMargin;
+    }
 }
